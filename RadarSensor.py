@@ -2,31 +2,73 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+# ==========================
+# CONFIGURACIÓN DE LA PÁGINA
+# ==========================
 st.set_page_config(
-    page_title="Dashboard Modelos",
+    page_title="Sensores Radar",
+    page_icon="📡",
     layout="wide"
 )
 
-st.title("📊 Dashboard de Modelos y Versiones")
+# ==========================
+# TÍTULO
+# ==========================
+st.title("📡 Dashboard de Sensores Radar")
+st.markdown(
+    "Monitoreo y análisis estadístico de equipos y versiones detectadas."
+)
 
-# Cargar CSV
+# ==========================
+# CARGA DE DATOS
+# ==========================
 df = pd.read_csv("muestra 300.csv")
 
-# Mostrar tabla
-st.subheader("Datos Cargados")
-st.dataframe(df, use_container_width=True)
+# ==========================
+# KPIs GENERALES
+# ==========================
+st.subheader("📊 Indicadores Generales")
 
-# Mostrar columnas
-st.write("Columnas detectadas:")
-st.write(df.columns.tolist())
+col1, col2, col3 = st.columns(3)
 
-# Seleccionar columna para filtrar
+col1.metric(
+    "Total Registros",
+    len(df)
+)
+
+col2.metric(
+    "Versiones ADB",
+    df["adb_version"].nunique()
+)
+
+col3.metric(
+    "Columnas",
+    len(df.columns)
+)
+
+# ==========================
+# TABLA GENERAL
+# ==========================
+st.subheader("📋 Datos Cargados")
+
+st.dataframe(
+    df,
+    use_container_width=True
+)
+
+# ==========================
+# FILTRO LATERAL
+# ==========================
+st.sidebar.header("Filtros")
+
 columna_filtro = st.sidebar.selectbox(
-    "Filtrar por",
+    "Seleccionar columna",
     df.columns
 )
 
-opciones = sorted(df[columna_filtro].dropna().unique())
+opciones = sorted(
+    df[columna_filtro].dropna().unique()
+)
 
 seleccion = st.sidebar.multiselect(
     "Seleccionar valores",
@@ -34,59 +76,104 @@ seleccion = st.sidebar.multiselect(
     default=opciones
 )
 
-df_filtrado = df[df[columna_filtro].isin(seleccion)]
+df_filtrado = df[
+    df[columna_filtro].isin(seleccion)
+]
 
-st.subheader("Datos Filtrados")
-st.dataframe(df_filtrado, use_container_width=True)
+# ==========================
+# DATOS FILTRADOS
+# ==========================
+st.subheader("🔎 Datos Filtrados")
 
-# Indicadores
-col1, col2, col3 = st.columns(3)
-
-col1.metric(
-    "Registros",
-    len(df_filtrado)
+st.dataframe(
+    df_filtrado,
+    use_container_width=True
 )
 
-col2.metric(
-    "Columnas",
-    len(df_filtrado.columns)
+# ==========================
+# REPORTE ADB_VERSION
+# ==========================
+if "adb_version" in df.columns:
+
+    st.subheader("📈 Resumen por Versión ADB")
+
+    resumen_version = (
+        df_filtrado["adb_version"]
+        .value_counts()
+        .reset_index()
+    )
+
+    resumen_version.columns = [
+        "adb_version",
+        "Cantidad"
+    ]
+
+    st.dataframe(
+        resumen_version,
+        use_container_width=True
+    )
+
+    colA, colB = st.columns(2)
+
+    with colA:
+
+        fig_bar = px.bar(
+            resumen_version,
+            x="adb_version",
+            y="Cantidad",
+            text_auto=True,
+            title="Cantidad por Versión ADB"
+        )
+
+        st.plotly_chart(
+            fig_bar,
+            use_container_width=True
+        )
+
+    with colB:
+
+        fig_pie = px.pie(
+            resumen_version,
+            names="adb_version",
+            values="Cantidad",
+            title="Distribución de Versiones ADB"
+        )
+
+        st.plotly_chart(
+            fig_pie,
+            use_container_width=True
+        )
+
+# ==========================
+# GRÁFICO ADICIONAL
+# ==========================
+st.subheader("📊 Distribución por Categoría")
+
+columna_grafico = st.selectbox(
+    "Seleccionar columna para análisis",
+    df.columns
 )
 
-col3.metric(
-    "Valores Únicos",
-    df_filtrado[columna_filtro].nunique()
-)
-
-# Gráfico de barras
 conteo = (
-    df_filtrado[columna_filtro]
+    df_filtrado[columna_grafico]
     .value_counts()
     .reset_index()
 )
 
-conteo.columns = [columna_filtro, "Cantidad"]
+conteo.columns = [
+    columna_grafico,
+    "Cantidad"
+]
 
 fig = px.bar(
     conteo,
-    x=columna_filtro,
+    x=columna_grafico,
     y="Cantidad",
-    title=f"Distribución por {columna_filtro}"
+    text_auto=True,
+    title=f"Distribución de {columna_grafico}"
 )
 
 st.plotly_chart(
     fig,
-    use_container_width=True
-)
-
-# Gráfico circular
-fig2 = px.pie(
-    conteo,
-    names=columna_filtro,
-    values="Cantidad",
-    title=f"Participación por {columna_filtro}"
-)
-
-st.plotly_chart(
-    fig2,
     use_container_width=True
 )
