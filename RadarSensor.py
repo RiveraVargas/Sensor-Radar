@@ -90,18 +90,3 @@ st.plotly_chart(
     fig2,
     use_container_width=True
 )
-Importante
-
-Si el archivo tiene caracteres especiales (tildes, ñ) y aparece un error, utiliza:
-
-df = pd.read_csv(
-    "muestra 300.csv",
-    encoding="latin-1"
-)
-
-o
-
-df = pd.read_csv(
-    "muestra 300.csv",
-    sep=";"
-)
