@@ -2,112 +2,106 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Configuración de página
 st.set_page_config(
-    page_title="Dashboard de Modelos",
+    page_title="Dashboard Modelos",
     layout="wide"
 )
 
 st.title("📊 Dashboard de Modelos y Versiones")
 
-# Cargar archivo Excel desde GitHub local
-archivo = "muestra 300.csv"
+# Cargar CSV
+df = pd.read_csv("muestra 300.csv")
 
-try:
-    df = pd.read_excel(archivo)
+# Mostrar tabla
+st.subheader("Datos Cargados")
+st.dataframe(df, use_container_width=True)
 
-    st.success("Archivo cargado correctamente")
+# Mostrar columnas
+st.write("Columnas detectadas:")
+st.write(df.columns.tolist())
 
-    # Mostrar columnas
-    st.subheader("Vista General de Datos")
-    st.dataframe(df, use_container_width=True)
+# Seleccionar columna para filtrar
+columna_filtro = st.sidebar.selectbox(
+    "Filtrar por",
+    df.columns
+)
 
-    # Seleccionar columna de versión
-    columnas = df.columns.tolist()
+opciones = sorted(df[columna_filtro].dropna().unique())
 
-    col_filtro = st.sidebar.selectbox(
-        "Seleccionar columna para filtrar",
-        columnas
-    )
+seleccion = st.sidebar.multiselect(
+    "Seleccionar valores",
+    opciones,
+    default=opciones
+)
 
-    opciones = sorted(df[col_filtro].dropna().unique())
+df_filtrado = df[df[columna_filtro].isin(seleccion)]
 
-    seleccion = st.sidebar.multiselect(
-        f"Filtrar por {col_filtro}",
-        opciones,
-        default=opciones
-    )
+st.subheader("Datos Filtrados")
+st.dataframe(df_filtrado, use_container_width=True)
 
-    df_filtrado = df[df[col_filtro].isin(seleccion)]
+# Indicadores
+col1, col2, col3 = st.columns(3)
 
-    st.subheader("Datos Filtrados")
-    st.dataframe(df_filtrado, use_container_width=True)
+col1.metric(
+    "Registros",
+    len(df_filtrado)
+)
 
-    # KPIs
-    c1, c2, c3 = st.columns(3)
+col2.metric(
+    "Columnas",
+    len(df_filtrado.columns)
+)
 
-    c1.metric("Total Registros", len(df_filtrado))
-    c2.metric("Columnas", len(df_filtrado.columns))
-    c3.metric("Valores Únicos", df_filtrado[col_filtro].nunique())
+col3.metric(
+    "Valores Únicos",
+    df_filtrado[columna_filtro].nunique()
+)
 
-    # Selección de gráfico
-    st.subheader("Gráficos")
+# Gráfico de barras
+conteo = (
+    df_filtrado[columna_filtro]
+    .value_counts()
+    .reset_index()
+)
 
-    col_x = st.selectbox(
-        "Eje X",
-        columnas,
-        index=0
-    )
+conteo.columns = [columna_filtro, "Cantidad"]
 
-    conteo = (
-        df_filtrado[col_x]
-        .value_counts()
-        .reset_index()
-    )
+fig = px.bar(
+    conteo,
+    x=columna_filtro,
+    y="Cantidad",
+    title=f"Distribución por {columna_filtro}"
+)
 
-    conteo.columns = [col_x, "Cantidad"]
+st.plotly_chart(
+    fig,
+    use_container_width=True
+)
 
-    fig_bar = px.bar(
-        conteo,
-        x=col_x,
-        y="Cantidad",
-        title=f"Distribución por {col_x}"
-    )
+# Gráfico circular
+fig2 = px.pie(
+    conteo,
+    names=columna_filtro,
+    values="Cantidad",
+    title=f"Participación por {columna_filtro}"
+)
 
-    st.plotly_chart(fig_bar, use_container_width=True)
+st.plotly_chart(
+    fig2,
+    use_container_width=True
+)
+Importante
 
-    fig_pie = px.pie(
-        conteo,
-        names=col_x,
-        values="Cantidad",
-        title=f"Participación por {col_x}"
-    )
+Si el archivo tiene caracteres especiales (tildes, ñ) y aparece un error, utiliza:
 
-    st.plotly_chart(fig_pie, use_container_width=True)
+df = pd.read_csv(
+    "muestra 300.csv",
+    encoding="latin-1"
+)
 
-    # Histograma para columnas numéricas
-    numericas = df_filtrado.select_dtypes(
-        include=["int64", "float64"]
-    ).columns
+o
 
-    if len(numericas) > 0:
-
-        variable = st.selectbox(
-            "Variable Numérica",
-            numericas
-        )
-
-        fig_hist = px.histogram(
-            df_filtrado,
-            x=variable,
-            nbins=30,
-            title=f"Distribución de {variable}"
-        )
-
-        st.plotly_chart(
-            fig_hist,
-            use_container_width=True
-        )
-
-except Exception as e:
-    st.error(f"Error al cargar archivo: {e}")
+df = pd.read_csv(
+    "muestra 300.csv",
+    sep=";"
+)
