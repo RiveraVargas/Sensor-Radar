@@ -11,7 +11,7 @@ st.set_page_config(
 st.title("📊 Dashboard de Modelos y Versiones")
 
 # Cargar archivo Excel desde GitHub local
-archivo = "muestra 600.xlsx"
+archivo = "muestra 300.csv"
 
 try:
     df = pd.read_excel(archivo)
