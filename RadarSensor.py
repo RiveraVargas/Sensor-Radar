@@ -6,7 +6,7 @@ import plotly.express as px
 # CONFIGURACIÓN DE PÁGINA
 # =====================================
 st.set_page_config(
-    page_title=" (GRUPO 04): "ANALISIS DE LA MADUREZ TECNOLOGICA ADS-B DE LAS AERONAVES QUE OPERAN EN LA FIR LIMA" ",
+    page_title=" (GRUPO 04): "ANALISIS DE LA MADUREZ TECNOLOGICA ADS-B DE LAS AERONAVES QUE OPERAN EN LA FIR LIMA"- ",
     page_icon="📡",
     layout="wide"
 )
