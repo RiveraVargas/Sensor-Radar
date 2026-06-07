@@ -16,7 +16,7 @@ st.set_page_config(
 # =====================================
 st.title("📡 (GRUPO 04): ANALISIS DE LA MADUREZ TECNOLOGICA ADS-B DE LAS AERONAVES QUE OPERAN EN LA FIR LIMA")
 st.markdown(
-    "### Dashboard interactivo para análisis y visualización de datos de sensores radar"
+    "### Dashboard interactivo para visualización de datos ADS-B"
 )
 
 # =====================================
