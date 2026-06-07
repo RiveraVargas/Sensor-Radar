@@ -14,7 +14,7 @@ st.set_page_config(
 # =====================================
 # TÍTULO
 # =====================================
-st.title("📡 DATA SENSOR RADAR - GRUPO 04")
+st.title("📡 (GRUPO 04): ANALISIS DE LA MADUREZ TECNOLOGICA ADS-B DE LAS AERONAVES QUE OPERAN EN LA FIR LIMA")
 st.markdown(
     "### Dashboard interactivo para análisis y visualización de datos de sensores radar"
 )
